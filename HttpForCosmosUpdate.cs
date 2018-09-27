@@ -9,8 +9,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Azure.WebJobs.Host;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Microsoft.Azure.Documents; 
-using Microsoft.Azure.Documents.Client; 
 
 namespace Company.Function
 {
@@ -22,17 +20,16 @@ namespace Company.Function
             [CosmosDB(
                 databaseName: "CheeseBurgerDatabase",
                 collectionName: "CollectionOfCheeseburgers",
-                ConnectionStringSetting = "CosmosDBConnection",
-                CreateIfNotExists = true)] DocumentClient client,
+                ConnectionStringSetting = "CosmosDBConnection"
+                )] ICollector<ItemLookup> item,
              ILogger log)
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
 
             string name = req.Query["name"];
-
-            string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-            dynamic data = JsonConvert.DeserializeObject(requestBody);
-            name = name ?? data?.name;
+            ItemLookup i = new ItemLookup();
+            i.ItemName = name; 
+            item.Add(i);
 
             return name != null
                 ? (ActionResult)new OkObjectResult($"Hello, {name}")
@@ -41,7 +38,12 @@ namespace Company.Function
 
         public class ItemLookup
         {
-            public string ItemId { get; set; }
+            public ItemLookup()
+            {
+                this.id = Guid.NewGuid().ToString();
+            }
+            public string ItemName { get; set; }
+            public string id { get; set; }
         }
     }
 }
