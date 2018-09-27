@@ -12,11 +12,12 @@
 ```
 
 4. Add Cosmos Extension by editing .csproj file: 
+As of September 27th, 2018 I could only get this to build with the Beta...  
 
 ```xml
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="1.0.22" />
-    <PackageReference Include="Microsoft.Azure.Webjobs.Extensions.CosmosDB" Version="3.0.1"/>
+    <PackageReference Include="Microsoft.Azure.Webjobs.Extensions.CosmosDB" Version="3.0.0-beta7"/>
   </ItemGroup>
 ```
 
