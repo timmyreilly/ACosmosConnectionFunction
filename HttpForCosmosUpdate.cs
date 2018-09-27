@@ -9,6 +9,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Azure.WebJobs.Host;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Microsoft.Azure.Documents; 
+using Microsoft.Azure.Documents.Client; 
 
 namespace Company.Function
 {
@@ -21,7 +23,7 @@ namespace Company.Function
                 databaseName: "CheeseBurgerDatabase",
                 collectionName: "CollectionOfCheeseburgers",
                 ConnectionStringSetting = "CosmosDBConnection",
-                CreateIfNotExists = true)] ItemLookup db,
+                CreateIfNotExists = true)] DocumentClient client,
              ILogger log)
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
