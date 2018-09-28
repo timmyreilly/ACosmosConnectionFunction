@@ -12,24 +12,18 @@ using Newtonsoft.Json;
 
 namespace Company.Function
 {
-    public static class HttpForCosmosUpdate
+    public static class UseDocumentClientToUpsert
     {
-        [FunctionName("HttpForCosmosUpdate")]
-        public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = null)]HttpRequest req,
-            [CosmosDB(
-                databaseName: "CheeseBurgerDatabase",
-                collectionName: "CollectionOfCheeseburgers",
-                ConnectionStringSetting = "CosmosDBConnection"
-                )] ICollector<CheeseBurger> item,
-             ILogger log)
+        [FunctionName("UseDocumentClientToUpsert")]
+        public static async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = null)]HttpRequest req, ILogger log)
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
 
             string name = req.Query["name"];
-            CheeseBurger i = new CheeseBurger();
-            i.ItemName = name;
-            item.Add(i);
+
+            string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
+            dynamic data = JsonConvert.DeserializeObject(requestBody);
+            name = name ?? data?.name;
 
             return name != null
                 ? (ActionResult)new OkObjectResult($"Hello, {name}")

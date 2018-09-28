@@ -12,9 +12,9 @@ using Newtonsoft.Json;
 
 namespace Company.Function
 {
-    public static class UpdateAnEntryInCosmos
+    public static class UpdateAnEntryInCosmosById
     {
-        [FunctionName("UpdateAnEntryInCosmos")]
+        [FunctionName("UpdateAnEntryInCosmosById")]
         public static async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = null)]HttpRequest req, 
         [CosmosDB(
                 databaseName: "CheeseBurgerDatabase",
@@ -37,6 +37,8 @@ namespace Company.Function
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
             dynamic data = JsonConvert.DeserializeObject(requestBody);
             name = name ?? data?.name;
+
+            item.ItemName = name; 
 
             return name != null
                 ? (ActionResult)new OkObjectResult($"Hello, {name}")
