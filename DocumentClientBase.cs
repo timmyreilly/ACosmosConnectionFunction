@@ -9,7 +9,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Azure.WebJobs.Host;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Microsoft.Documents.Client; 
+using System.Linq;
+using Microsoft.Azure.Documents.Client; 
+using Microsoft.Azure.Documents.Linq; 
 
 namespace Company.Function
 {
@@ -18,21 +20,36 @@ namespace Company.Function
         [FunctionName("DocumentClientBase")]
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = null)]HttpRequest req, 
-            [CosmosDB()] DocumentClient client, ILogger log)
+            [CosmosDB(
+                databaseName: "CheeseBurgerDatabase",
+                collectionName: "CollectionOfCheeseburgers",
+                ConnectionStringSetting = "CosmosDBConnection"
+            )] DocumentClient client, ILogger log)
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
 
-            string name = req.Query["name"];
+            var searchterm = req.Query["searchterm"];
+            if (string.IsNullOrWhiteSpace(searchterm))
+            {
+                return (ActionResult)new NotFoundResult();
+            }
 
-            log.LogInformation(client); 
+            Uri collectionUri = UriFactory.CreateDocumentCollectionUri("CheeseBurgerDatabase", "CollectionOfCheeseburgers");
 
-            string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-            dynamic data = JsonConvert.DeserializeObject(requestBody);
-            name = name ?? data?.name;
+            log.LogInformation($"Searching for: {searchterm}");
 
-            return name != null
-                ? (ActionResult)new OkObjectResult($"Hello, {name}")
-                : new BadRequestObjectResult("Please pass a name on the query string or in the request body");
+            IDocumentQuery<CheeseBurger> query = client.CreateDocumentQuery<CheeseBurger>(collectionUri)
+                .Where(p => p.ItemName.Contains(searchterm))
+                .AsDocumentQuery();
+
+            while (query.HasMoreResults)
+            {
+                foreach (CheeseBurger result in await query.ExecuteNextAsync())
+                {
+                    log.LogInformation(result.ToString());
+                }
+            }
+            return new OkResult();
         }
     }
 }
