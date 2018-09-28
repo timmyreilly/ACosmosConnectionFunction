@@ -98,5 +98,47 @@ Inside of update, we can also have update, or upsert. +1
 16. CosmosDocBindingReadEntries - Why would I bind and read like this? 
 
 
+First I'm going to start with some base functions that we should be able to use for the subsequent Functions. 
+1. DocumentClientBase
+This will contain this header function declaration: 
+
+```csharp
+
+using Microsoft.Azure.Documents.Client;
+using Microsoft.Azure.Documents.Linq;
+
+public static async Task<IActionResult> Run(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", 
+                Route = null)]HttpRequest req,
+            [CosmosDB(
+                databaseName: "ToDoItems",
+                collectionName: "Items",
+                ConnectionStringSetting = "CosmosDBConnection")] DocumentClient client,
+            TraceWriter log)
+
+```
+
+Then we'll use that `client` to do all sorts of fun stuff.
+
+Okay, so we also need these usings... Which don't come with the CosmosDB Extension. Let's try some other stuff. 
+
+Going to add this to `.csproj` : https://www.nuget.org/packages/Microsoft.Azure.DocumentDB/ 
+But why does it say DocumentDB? 
+
+This is what my PackageReference list includes now: 
+
+```xml
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="1.0.22" />
+    <PackageReference Include="Microsoft.Azure.Webjobs.Extensions.CosmosDB" Version="3.0.1-rc1"/>
+    <PackageReference Include="Microsoft.Azure.DocumentDB" Version ="2.1.1">
+  </ItemGroup>
+```
+
+Okay that fixed the missing reference. 
+
+
+
+
 
 
