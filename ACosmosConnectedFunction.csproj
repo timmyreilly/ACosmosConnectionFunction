@@ -6,7 +6,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="1.0.22" />
     <PackageReference Include="Microsoft.Azure.Webjobs.Extensions.CosmosDB" Version="3.0.1-rc1"/>
-    <PackageReference Include="Microsoft.Azure.DocumentDB" Version ="2.1.1">
+    <PackageReference Include="Microsoft.Azure.DocumentDB" Version ="2.1.1" />
   </ItemGroup>
   <ItemGroup>
     <None Update="host.json">

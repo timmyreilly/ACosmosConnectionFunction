@@ -24,6 +24,8 @@ namespace Company.Function
 
             string name = req.Query["name"];
 
+            log.LogInformation(client); 
+
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
             dynamic data = JsonConvert.DeserializeObject(requestBody);
             name = name ?? data?.name;
